@@ -160,13 +160,13 @@
 							<div class="form-group row">
 								<label for="example-date-input" class="col-2 col-form-label">Start</label>
 								<div class="col-10">
-									<input class="form-control" type="date" value="" id="example-date-input" name="startDate" required>
+									<input class="form-control date-start-add" type="date" value="" id="example-date-input" name="startDate" required>
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="example-date-input" class="col-2 col-form-label">End</label>
 								<div class="col-10">
-									<input class="form-control" type="date" value="" id="example-date-input" name="endDate" required>
+									<input class="form-control date-end-add" type="date" value="" id="example-date-input" name="endDate" required>
 								</div>
 							</div>
 							<fieldset class="form-group">
@@ -200,7 +200,7 @@
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-							<button type="submit" class="btn btn-primary">Save</button>
+							<button type="submit" class="btn btn-primary btn-submit-form">Save</button>
 						</div>
 					</div>
 				</div>
@@ -209,7 +209,7 @@
 
 		<!-- Modal Edit-->
 		<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-			<form method="POST" action="todo.php">
+			<form method="POST" action="todo.php" id="form-edit-todo">
 				<div class="modal-dialog" role="document">
 					<div class="modal-content">
 						<div style="display: none;">
@@ -233,13 +233,13 @@
 							<div class="form-group row">
 								<label for="example-date-input" class="col-2 col-form-label">Start</label>
 								<div class="col-10">
-									<input class="form-control" type="date" value="2011-08-19" id="start-date-edit" name="startDate">
+									<input class="form-control date-start-edit" type="date" value="2011-08-19" id="start-date-edit" name="startDate">
 								</div>
 							</div>
 							<div class="form-group row">
 								<label for="example-date-input" class="col-2 col-form-label">End</label>
 								<div class="col-10">
-									<input class="form-control" type="date" value="2011-08-19" id="end-date-edit" name="endDate">
+									<input class="form-control date-end-edit" type="date" value="2011-08-19" id="end-date-edit" name="endDate">
 								</div>
 							</div>
 							<fieldset class="form-group">
@@ -273,14 +273,42 @@
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-							<button type="submit" class="btn btn-primary">Save</button>
+							<button type="submit" class="btn btn-primary btn-submit-form">Save</button>
 						</div>
 					</div>
 				</div>
 			</form>
 		</div>
 		<script>
+
+			$(".date-start-add, .date-end-add").change(function(){
+				let start = $(".date-start-add").val();
+				let end = $(".date-end-add").val();
+				compareDate(start, end);
+			});
+
+			$(".date-start-edit, .date-end-edit").change(function(){
+				let start = $(".date-start-edit").val();
+				let end = $(".date-end-edit").val();
+				compareDate(start, end);
+			});
+
+			function compareDate(start, end){
+				if(new Date(start) > new Date(end))
+				{
+					alert("Start date is greater than the end date");
+					$(".btn-submit-form").prop('disabled', true);
+				}
+				else{
+					$(".btn-submit-form").prop('disabled', false);
+				}
+			}
+
+
 			$(".m-widget4__progress").click(function(){
+				$('#form-edit-todo').trigger("reset");
+				$(".btn-submit-form").prop('disabled', true);
+				
 				let id = $(this).attr("data-id");
 				let todos = <?php echo json_encode($todos); ?>;
 				let todoInfo = null;
