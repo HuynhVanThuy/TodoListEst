@@ -34,49 +34,28 @@ class TodoModel
 	{
 		$conn = $this->connectDB();
 		$stmt = $conn->prepare("INSERT INTO todo (task_name, start_date, end_date, status, create_date) VALUES (?, ?, ?, ?, ?)");
-
 		$stmt->bind_param('sssss', $todo->taskName, $todo->startDate, $todo->endDate, $todo->status, $todo->createDate);
-
 		$check = $stmt->execute();
-
 		$stmt->close();
 		$conn->close();
-
 		return $check;
-
 	}
 
-	public function edit()
+	public function edit($todo)
 	{
 		$conn = $this->connectDB();
-		// $sql = "UPDATE todo SET task_name=".$todo->taskName." ,".$todo->startDate." ,".$todo->endDate." ,".$todo->status.", ".$todo->createDate."WHERE id=$id";
-		$todo = new \stdClass();
-		$todo->id = 1;
-		$todo->taskName = "thuy";
-		$todo->startDate = "2020-11-02";
-		$todo->endDate = "2020-11-02";
-		$todo->status = "okok";
-		$todo->createDate = "2020-11-02";
-		$sql = "UPDATE todo SET task_name=".$todo->taskName." ,".$todo->startDate." ,".$todo->endDate." ,".$todo->status.", ".$todo->createDate."WHERE id = ".$todo->id;
-		echo $sql;
-  //   	if ($this->conn->query($sql) === TRUE) {
-		// 	echo "Record updated successfully";
-		// } else {
-		// 	echo "Error updating record: " . $conn->error;
-		// }
+		$sql = "UPDATE todo SET task_name = '".$todo->taskName."', start_date = '".$todo->startDate."', end_date = '".$todo->endDate."', status = '".$todo->status."', create_date = '".$todo->createDate."' WHERE id = ".$todo->id;
+    	$check = $conn->query($sql);
+		$conn->close();
+		return $check;
 	}
 
-	public function deltete($id){
+	public function delete($id){
 		$conn = $this->connectDB();
 		$sql = "DELETE FROM todo WHERE id = ".$id;
-
-		if ($conn->query($sql) === TRUE) {
-		  echo "Record deleted successfully";
-		} else {
-		  echo "Error deleting record: " . $conn->error;
-		}
-
+		$check = $conn->query($sql);
 		$conn->close();
+		return $check;
 	}
 
 	private function connectDB(){

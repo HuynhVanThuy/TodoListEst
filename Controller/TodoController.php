@@ -42,6 +42,30 @@ class TodoController
 			$this->msERR = "Failed to add data";
     	}
     }
+
+    public function edit()
+    {
+    	$this->date = $_REQUEST['createDate'];
+
+    	$todo = new \Entity\TodoEntity($_REQUEST['id'], $_REQUEST['taskName'], $_REQUEST['startDate'], $_REQUEST['endDate'], $_REQUEST['status'], $_REQUEST['createDate']);
+    	
+    	if($this->model->edit($todo)){
+    		$this->msOK = "Edited data successfully!";
+    	}
+    	else{
+			$this->msERR = "Failed to edit data";
+    	}
+    }
+
+    public function delete()
+    {
+    	if($this->model->delete($_REQUEST['delete'])){
+    		$this->msOK = "Deleted data successfully!";
+    	}
+    	else{
+			$this->msERR = "Failed to delete data";
+    	}
+    }
 }
 
 ?>
