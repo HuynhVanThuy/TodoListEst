@@ -297,7 +297,6 @@
 				}
 				// Set value for fomr edit from todoInfo
 				let type = "-edit";
-				console.log(todoInfo);
 				$('#id'+type).val(todoInfo['id']);
 				$('#task-name'+type).val(todoInfo['taskName']);
 				$('#start-date'+type).val(todoInfo['startDate']);

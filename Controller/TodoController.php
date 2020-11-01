@@ -29,6 +29,11 @@ class TodoController
 		return $this->model->view($this->date);	
     }
 
+    public function view()
+    {
+    	echo "ok";
+    }
+
     public function add()
     {
     	$this->date = $_REQUEST['createDate'];
@@ -48,7 +53,7 @@ class TodoController
     	$this->date = $_REQUEST['createDate'];
 
     	$todo = new \Entity\TodoEntity($_REQUEST['id'], $_REQUEST['taskName'], $_REQUEST['startDate'], $_REQUEST['endDate'], $_REQUEST['status'], $_REQUEST['createDate']);
-    	
+
     	if($this->model->edit($todo)){
     		$this->msOK = "Edited data successfully!";
     	}

@@ -15,6 +15,21 @@ class TodoModel
 		
 	}
 
+	public function getAllTodos(){
+		$conn = $this->connectDB();
+		$sql = "SELECT * FROM todo";
+		$result = $conn->query($sql);
+		$dataTodo = array();
+		if ($result->num_rows > 0) {
+			while($row = $result->fetch_assoc()) {
+				$todo = new \Entity\TodoEntity($row['id'], $row['task_name'], $row['start_date'], $row['end_date'], $row['status'], $row['create_date']);
+				array_push($dataTodo, $todo);
+			}
+		} 
+		$conn->close();
+		return $dataTodo;
+	}
+
 	public function view($date){
 		$conn = $this->connectDB();
 		$sql = "SELECT * FROM todo WHERE create_date = '".$date."'";

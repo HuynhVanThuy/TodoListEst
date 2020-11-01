@@ -1,3 +1,9 @@
+<?php
+    require_once("Controller/IndexController.php");
+    $indexController = new Controller\IndexController();
+    $todos = null;
+    $todos = $indexController->index();
+?>
 <!DOCTYPE html>
 <html lang='en'>
 <head>
@@ -8,24 +14,71 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
 
-    $( document ).ready(function() {
-        var calendarEl = document.getElementById('calendar');
+        $(document).ready(function() {
+            let todos = <?php echo json_encode($todos); ?>;
+            let dataEvent = [];
+            // for (let [index, todo] of Object.entries(todos)) {
+            //     let color = "";
+            //     switch(todo['status']) {
+            //       case "Planning":
+            //         color = "#17a2b8";
+            //         break;
+            //       case "Doing":
+            //         color = "#28a745";
+            //         break;
+            //       case "Complete":
+            //         color = "#ffc107";
+            //         break;
+            //     }
+            //     dataEvent.push({
+            //         id : todo['id'], 
+            //         title : todo['taskName'], 
+            //         start : todo['startDate'], 
+            //         end : todo['endDate'], 
+            //         color : color
+            //     });
+            // }
 
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            headerToolbar: {
-                center: 'dayGridMonth, dayGridWeek, dayGridDay'
+            for (let [index, todo] of Object.entries(todos)) {
+                let color = "";
+                switch(todo['status']) {
+                  case "Planning":
+                    color = "#17a2b8";
+                    break;
+                  case "Doing":
+                    color = "#28a745";
+                    break;
+                  case "Complete":
+                    color = "#ffc107";
+                    break;
+                }
+                dataEvent.push({
+                    id : todo['id'], 
+                    title : todo['taskName'],
+                    start : todo['createDate'],
+                    color : color
+                });
             }
-        });
-        
-        calendar.render();
 
-        calendar.on('dateClick', function(info) {
-            console.log('clicked on ' + info.dateStr);
-            window.location.href = './view/todo.php?date='+info.dateStr;
-        });
-    });
+            var calendarEl = document.getElementById('calendar');
 
-</script>
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                headerToolbar: {
+                    center: 'dayGridMonth, dayGridWeek, dayGridDay'
+                },
+                events: dataEvent
+            });
+            
+            calendar.render();
+
+            calendar.on('dateClick', function(info) {
+                window.location.href = './view/todo.php?date='+info.dateStr;
+            });
+        });
+
+
+
+    </script>
 </head>
 <body>
     <div id='calendar'></div>
