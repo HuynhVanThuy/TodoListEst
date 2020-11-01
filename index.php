@@ -2,6 +2,7 @@
 <html lang='en'>
 <head>
     <meta charset='utf-8' />
+    <title>Home page</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.2/main.min.css">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.2/main.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -19,7 +20,8 @@
         calendar.render();
 
         calendar.on('dateClick', function(info) {
-          console.log('clicked on ' + info.dateStr);
+            console.log('clicked on ' + info.dateStr);
+            window.location.href = './view/todo.php?date='+info.dateStr;
         });
     });
 
