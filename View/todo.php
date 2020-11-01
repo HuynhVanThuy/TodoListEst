@@ -1,3 +1,14 @@
+<?php
+	require_once("../Controller/TodoController.php");
+	$todoController = new Controller\TodoController();
+	if($_SERVER['REQUEST_METHOD'] == "GET" && !empty($_REQUEST['date'])){
+		$todos = $todoController->index($_REQUEST['date']);		
+	}
+	if($_SERVER['REQUEST_METHOD'] == "POST" && $_REQUEST['type'] == "ADD"){
+		$todoController->add();
+		$todos = $todoController->index($todoController->date);
+	}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,20 +22,21 @@
 	<link rel="stylesheet" href="../assets/css/todo.css">
 </head>
 <body>
-	<?php
-		require_once("../Controller/TodoController.php");
-		$todoController = new Controller\TodoController();
-		$todos = $todoController->index();
-	?>
 	<div class="container">
+		<div class="col-md-12">
+			<?php if($todoController->msOK){ ?>
+					<div class="alert alert-success" role="alert">
+						<?= $todoController->msOK ?>
+					</div>
+			<?php } ?>
+			<?php if($todoController->msERR){ ?>
+					<div class="alert alert-danger" role="alert">
+						<?= $todoController->msERR ?>
+					</div>
+			<?php } ?>
+		</div>
 		<div class="col-md-12 text-center">
-			<?php 
-				$date = "";
-				if (!empty($todos)) {
-					$date = $todos[0]->createDate;
-				} 
-			?>
-			<h6><?= $date ?></h6>
+			<h6><?= $todoController->date ?></h6>
 		</div>
 		<div class="col-md-12">
 			<!--begin:: Widgets/User Progress -->
@@ -107,134 +119,145 @@
 
 	<!-- Modal Add-->
 	<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">Task info</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group row">
-						<label for="example-text-input" class="col-2 col-form-label">Task name</label>
-						<div class="col-10">
-							<input class="form-control" type="text" value="Artisanal kale" id="example-text-input">
-						</div>
+		<form method="POST" action="todo.php">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div style="display: none;">
+						<input name="type" value="ADD">
+						<input name="createDate" value="<?= $todoController->date ?>">
 					</div>
-					<div class="form-group row">
-						<label for="example-date-input" class="col-2 col-form-label">Start</label>
-						<div class="col-10">
-							<input class="form-control" type="date" value="2011-08-19" id="example-date-input">
-						</div>
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Task info</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
 					</div>
-					<div class="form-group row">
-						<label for="example-date-input" class="col-2 col-form-label">End</label>
-						<div class="col-10">
-							<input class="form-control" type="date" value="2011-08-19" id="example-date-input">
-						</div>
-					</div>
-					<fieldset class="form-group">
-						<div class="row">
-							<legend class="col-form-label col-sm-2 pt-0">Status</legend>
-							<div class="col-sm-10">
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked>
-									<label class="form-check-label" for="gridRadios1">
-										Planning
-									</label>
-									<button type="button" class="btn btn-info btn-sm"></button>
-								</div>
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
-									<label class="form-check-label" for="gridRadios2">
-										Doing
-									</label>
-									<button type="button" class="btn btn-success btn-sm"></button>
-								</div>
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="gridRadios" id="gridRadios3" value="option2">
-									<label class="form-check-label" for="gridRadios3">
-										Complete
-									</label>
-									<button type="button" class="btn btn-warning btn-sm"></button>
-								</div>
+					<div class="modal-body">
+						<div class="form-group row">
+							<label for="example-text-input" class="col-2 col-form-label">Task name</label>
+							<div class="col-10">
+								<input class="form-control" type="text" value="" id="example-text-input" name="taskName" required>
 							</div>
 						</div>
-					</fieldset>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-					<button type="button" class="btn btn-primary">Save</button>
+						<div class="form-group row">
+							<label for="example-date-input" class="col-2 col-form-label">Start</label>
+							<div class="col-10">
+								<input class="form-control" type="date" value="" id="example-date-input" name="startDate" required>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="example-date-input" class="col-2 col-form-label">End</label>
+							<div class="col-10">
+								<input class="form-control" type="date" value="" id="example-date-input" name="endDate" required>
+							</div>
+						</div>
+						<fieldset class="form-group">
+							<div class="row">
+								<legend class="col-form-label col-sm-2 pt-0">Status</legend>
+								<div class="col-sm-10">
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="status" id="gridRadios1" value="Planning" checked>
+										<label class="form-check-label" for="gridRadios1">
+											Planning
+										</label>
+										<button type="button" class="btn btn-info btn-sm"></button>
+									</div>
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="status" id="gridRadios2" value="Doing">
+										<label class="form-check-label" for="gridRadios2">
+											Doing
+										</label>
+										<button type="button" class="btn btn-success btn-sm"></button>
+									</div>
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="status" id="gridRadios3" value="Complete">
+										<label class="form-check-label" for="gridRadios3">
+											Complete
+										</label>
+										<button type="button" class="btn btn-warning btn-sm"></button>
+									</div>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-primary">Save</button>
+					</div>
 				</div>
 			</div>
-		</div>
+		</form>
 	</div>
 
 	<!-- Modal Edit-->
 	<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="exampleModalLabel">Task info</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body">
-					<div class="form-group row">
-						<label for="example-text-input" class="col-2 col-form-label">Task name</label>
-						<div class="col-10">
-							<input class="form-control" type="text" value="Artisanal kale" id="example-text-input">
-						</div>
+		<form method="POST" action="../Controller/TodoController.php">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div style="display: none;">
+						<input name="type" value="EDIT">
 					</div>
-					<div class="form-group row">
-						<label for="example-date-input" class="col-2 col-form-label">Start</label>
-						<div class="col-10">
-							<input class="form-control" type="date" value="2011-08-19" id="example-date-input">
-						</div>
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Task info</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
 					</div>
-					<div class="form-group row">
-						<label for="example-date-input" class="col-2 col-form-label">End</label>
-						<div class="col-10">
-							<input class="form-control" type="date" value="2011-08-19" id="example-date-input">
-						</div>
-					</div>
-					<fieldset class="form-group">
-						<div class="row">
-							<legend class="col-form-label col-sm-2 pt-0">Status</legend>
-							<div class="col-sm-10">
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked>
-									<label class="form-check-label" for="gridRadios1">
-										Planning
-									</label>
-									<button type="button" class="btn btn-info btn-sm"></button>
-								</div>
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
-									<label class="form-check-label" for="gridRadios2">
-										Doing
-									</label>
-									<button type="button" class="btn btn-success btn-sm"></button>
-								</div>
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="gridRadios" id="gridRadios3" value="option2">
-									<label class="form-check-label" for="gridRadios3">
-										Complete
-									</label>
-									<button type="button" class="btn btn-warning btn-sm"></button>
-								</div>
+					<div class="modal-body">
+						<div class="form-group row">
+							<label for="example-text-input" class="col-2 col-form-label">Task name</label>
+							<div class="col-10">
+								<input class="form-control" type="text" value="Artisanal kale" id="example-text-input" name="taskName">
 							</div>
 						</div>
-					</fieldset>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-					<button type="button" class="btn btn-primary">Save</button>
+						<div class="form-group row">
+							<label for="example-date-input" class="col-2 col-form-label">Start</label>
+							<div class="col-10">
+								<input class="form-control" type="date" value="2011-08-19" id="example-date-input" name="startDate">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="example-date-input" class="col-2 col-form-label">End</label>
+							<div class="col-10">
+								<input class="form-control" type="date" value="2011-08-19" id="example-date-input" name="endDate">
+							</div>
+						</div>
+						<fieldset class="form-group">
+							<div class="row">
+								<legend class="col-form-label col-sm-2 pt-0">Status</legend>
+								<div class="col-sm-10">
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="status" id="gridRadios1" value="Planning" checked>
+										<label class="form-check-label" for="gridRadios1">
+											Planning
+										</label>
+										<button type="button" class="btn btn-info btn-sm"></button>
+									</div>
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="status" id="gridRadios2" value="Doing">
+										<label class="form-check-label" for="gridRadios2">
+											Doing
+										</label>
+										<button type="button" class="btn btn-success btn-sm"></button>
+									</div>
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="status" id="gridRadios3" value="Complete">
+										<label class="form-check-label" for="gridRadios3">
+											Complete
+										</label>
+										<button type="button" class="btn btn-warning btn-sm"></button>
+									</div>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-primary">Save</button>
+					</div>
 				</div>
 			</div>
-		</div>
+		</form>
 	</div>
 
 </body>
